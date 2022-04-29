@@ -53,7 +53,6 @@ fenetre_serveur::fenetre_serveur() : QWidget()
 
 
     // Demarrage du serveur
-    /* Songer a mettre ceci hors du constructeur plus tard : J'aimerai pouvoir faire plusieurs serveurs en simultanné */
 }
 
 void fenetre_serveur::ouvrir_serveur()
@@ -127,8 +126,11 @@ void fenetre_serveur::donneesRecues()
         }
 
         if(socket->bytesAvailable() >= tailleMessage){
+            QString date = QDateTime::currentDateTime().toString("dd/MM/yy hh:mm");
+            QString type = "TEXT"; //Pour indiquer ce qu'on envoie, le client appelera différente fonction selon la valeur de cet élément, /* Liens voire images */
             QString message;
             in >> message; // On vide entièrement in dans message;
+            message = type + "|" + date + "|" + message; // La fonction de réception du client prend | comme séparateur
             envoyerATous(message); // On l'envoi à tout le monde;
             tailleMessage = 0; // On se rend prêt à recevoir un nouveau message;
         }

@@ -3,6 +3,9 @@ Projet de chat multicast demandé pour le cours d'OS et réseau // Côté serveu
 
 --------------------------------------
 
+# Serveur-1.2.0 : Ajout d'une formatage des messages
+1) Les messages échangés sont maintenant affichés dans le client avec la date, l'heure, et le pseudo en gras. Possibilité d'améliorer pour formater des échanges autres que du texte.
+
 # Serveur-1.1.0 : Choix du port
 1) Ajout d'une fonctionalité permettant de choisir le port du serveur
 2) Ajout des fonctionalité d'ouverture et fermeture du serveur sans devoir quitter la fenêtre.

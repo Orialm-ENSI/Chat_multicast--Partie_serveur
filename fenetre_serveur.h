@@ -26,6 +26,8 @@ private slots:
     void ouvrir_serveur();
     void fermer_serveur();
 
+private: //Methodes privées
+
 private:
     // Elements de l'interface
     QLineEdit *champ_port = nullptr;
