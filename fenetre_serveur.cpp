@@ -56,6 +56,7 @@ void fenetre_serveur::donneesRecues()
 
     QTcpSocket *socket = qobject_cast< QTcpSocket *>(sender());
     if(socket == 0){ return; }
+debut:
 
     // Recuperation du message
     QDataStream in(socket); /*rendre les if plus propres */
@@ -73,6 +74,7 @@ void fenetre_serveur::donneesRecues()
     in >> message; // On vide entièrement in dans message;
     envoyerATous(message); // On l'envoi à tout le monde;
     tailleMessage = 0; // On se rend prêt à recevoir un nouveau message;
+    if(!in.atEnd()){goto debut;}
 }
 
 void fenetre_serveur::envoyerATous(const QString& message)

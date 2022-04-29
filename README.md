@@ -3,7 +3,10 @@ Projet de chat multicast demandé pour le cours d'OS et réseau // Côté serveu
 
 --------------------------------------
 
-# Client-1.0.2 : Retour en arrière
+# Serveur-1.0.3 : Correction du retard
+1) La fonction de réception des données du client s'arrêtais une fois qu'elle a lu un message dont la taille est indiquée par le début d'un message, ce qui entraînait un retard d'autant plus important que le serveur envoie de messages. ajout d'un label et d'un goto pour rester dans la fonction tant qu'on est pas arrivé à la fin du flux du socket. La même modification a été apportée au serveur.
+
+# Serveur-1.0.2 : Retour en arrière
 1) La combinaison client / serveur présentait un retard de plusieurs messages. L'ajout des if else a rendu ce retard encore plus important. Je retourne au code précédent qui avait le retard le plus faible (égal au nombre de messages systèmes que le serveur envoie). Le header n'est pas ramené en arrière.
 
 # Serveur-1.0.1 : corrections de propreté
