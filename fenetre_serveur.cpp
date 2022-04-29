@@ -43,43 +43,36 @@ void fenetre_serveur::nouvelleConnexion()
     QObject::connect(nouveauClient, &QTcpSocket::disconnected, this, &fenetre_serveur::deconnexionClient); //idem
 
     // Annonces
-    fenetre_serveur::envoyerATous("Un nouveau client vient de se connecter 1"); /* Annonce 1*/
-    fenetre_serveur::envoyerATous("Un nouveau client vient de se connecter 2"); /* Annonce 2*/
-    fenetre_serveur::envoyerATous("Un nouveau client vient de se connecter 3"); /* Annonce 3*/
+    fenetre_serveur::envoyerATous("Un nouveau client vient de se connecter 1"); // Annonce 1
+    fenetre_serveur::envoyerATous("Un nouveau client vient de se connecter 2"); // Annonce 2
+    fenetre_serveur::envoyerATous("Un nouveau client vient de se connecter 3"); // Annonce 3
 
 }
 
 void fenetre_serveur::donneesRecues()
 {
     // Recherche du QTcpSoccket du client qui envoi
+    //fenetre_serveur::envoyerATous("test de réponse\n");
+
     QTcpSocket *socket = qobject_cast< QTcpSocket *>(sender());
-    if(socket == 0){
-        return;
-    }
-    else{
-        // Recuperation du message
-        QDataStream in(socket);
+    if(socket == 0){ return; }
 
-        if(tailleMessage == 0){ // Si on a pas déjà la taille du message
+    // Recuperation du message
+    QDataStream in(socket); /*rendre les if plus propres */
+    if(tailleMessage == 0){ // Si on a pas déjà la taille du message
 
-            if(socket->bytesAvailable() < (int)sizeof(quint16)){ // Si on a pas au moins un int, alors on a pas encore reçu le message en entier
-                return;
-            }
-            else{
-                in >> tailleMessage; // Si on au moins un entier, alors on a la taille du message
-            }
-        }
-
-        else if(socket->bytesAvailable() < tailleMessage){ // Si on a pas encore le message entier, on attend
+        if(socket->bytesAvailable() < (int)sizeof(quint16)){ // Si on a pas au moins un int, alors on a pas encore reçu le message en entier
             return;
         }
-        else { // Si on a le message en entier
-            QString message;
-            in >> message; // On vide entièrement in dans message;
-            envoyerATous(message); // On l'envoi à tout le monde;
-            tailleMessage = 0; // On se rend prêt à recevoir un nouveau message;
-        }
+        in >> tailleMessage; // Si on au moins un entier, alors on a la taille du message
     }
+
+    if(socket->bytesAvailable() < tailleMessage) {return;} // Si on a pas encore le message entier, on attend
+
+    QString message;
+    in >> message; // On vide entièrement in dans message;
+    envoyerATous(message); // On l'envoi à tout le monde;
+    tailleMessage = 0; // On se rend prêt à recevoir un nouveau message;
 }
 
 void fenetre_serveur::envoyerATous(const QString& message)
@@ -103,13 +96,12 @@ void fenetre_serveur::deconnexionClient()
 {
     envoyerATous("Un client vient de se déconnecter");
 
-    // Qui se déconnecte ??
+    // Qui ?
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
-    if( socket == 0){ // Si on ne trouve personne qui se déconnecte
-        return;
-    }
-    else{
-        clients.removeOne(socket); // On retire le client
-        socket->deleteLater();
-    }
+    if( socket == 0) { return; }
+
+    clients.removeOne(socket); // On retire le client
+    socket->deleteLater();
+    /* Mettre des else !!! */
+
 }

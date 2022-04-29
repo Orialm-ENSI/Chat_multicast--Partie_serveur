@@ -3,6 +3,9 @@ Projet de chat multicast demandé pour le cours d'OS et réseau // Côté serveu
 
 --------------------------------------
 
+# Client-1.0.2 : Retour en arrière
+1) La combinaison client / serveur présentait un retard de plusieurs messages. L'ajout des if else a rendu ce retard encore plus important. Je retourne au code précédent qui avait le retard le plus faible (égal au nombre de messages systèmes que le serveur envoie). Le header n'est pas ramené en arrière.
+
 # Serveur-1.0.1 : corrections de propreté
 1) certains pointeurs était initialisés sur rien et le programme client crashait parfois à l'éxécution. des forum anglophones ont proposé de modifier le header de la class pour mettre tous les pointeurs sur nullptr avant même l'appel du constructeur.
 2) le slot "donneesRecues" utilisait une succession de if avec des return, en supposant que ce qui venait après s'éxécutait forcément s'il n'y a pas eu de return. Ajout de else pour ne pas laisser les if avec des pates en l'air.
