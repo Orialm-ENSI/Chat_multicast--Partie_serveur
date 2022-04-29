@@ -9,7 +9,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 class fenetre_serveur : public QWidget {
-    //Q_OBJECT  J'arrive pas à voir pourquoi mais ça compile pas si je laisse ça...
+    Q_OBJECT
 
 public:
     fenetre_serveur();
@@ -22,12 +22,12 @@ private slots:
 
 private:
     // Elements de l'interface
-    QLabel *etatServeur;
-    QPushButton *boutonQuitter;
-    QVBoxLayout *layout;
+    QLabel *etatServeur = nullptr;
+    QPushButton *boutonQuitter = nullptr;
+    QVBoxLayout *layout = nullptr;
 
     // Elements de réseau
-    QTcpServer *serveur;
+    QTcpServer *serveur = nullptr;
     QList<QTcpSocket *> clients;
     quint16 tailleMessage = 0;
 
