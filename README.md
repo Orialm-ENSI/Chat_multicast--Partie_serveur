@@ -3,6 +3,10 @@ Projet de chat multicast demandé pour le cours d'OS et réseau // Côté serveu
 
 --------------------------------------
 
+# Serveur-1.1.0 : Choix du port
+1) Ajout d'une fonctionalité permettant de choisir le port du serveur
+2) Ajout des fonctionalité d'ouverture et fermeture du serveur sans devoir quitter la fenêtre.
+
 # Serveur-1.0.4 : corrections de propreté
 1) remplacement du goto/label par une boucle do/while dans le slot "donneesRecues"
 2) dans les slot "donneesRecues" et "deconnexionClient", réécriture des if : Les conditions sont inversées dans les if, ce qui était fait précédément si on entrait pas dans le if est désormais fait si on entre dans les if, et les return vont dans les else, comme cas par défaut. Les if n'ont plus de pate en l'air.

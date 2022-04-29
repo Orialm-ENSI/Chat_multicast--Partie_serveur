@@ -4,32 +4,89 @@
 // Constructeur par défaut
 fenetre_serveur::fenetre_serveur() : QWidget()
 {
-    // Texte d'information du serveur
-    etatServeur = new QLabel(this);
+
 
     // Parametres du bouton
+    champ_port = new QLineEdit(this);
+    {
+        champ_port->setPlaceholderText("port serveur");
+        champ_port->setInputMask("9999000000");
+        champ_port->setToolTip("Entrez un port supérieur ou égal à 1024 pour pouvoir démarrer le serveur dessus");
+    }
+
+    bouton_ouverture_serveur = new QPushButton("Ouverture", this);
+    {
+        bouton_ouverture_serveur->setToolTip("Ouvre le serveur sur le port choisi");
+        bouton_ouverture_serveur->setEnabled(true);
+        QObject::connect(bouton_ouverture_serveur, &QPushButton::clicked, this, &fenetre_serveur::ouvrir_serveur);
+    }
+
+    bouton_fermeture_serveur = new QPushButton("Fermeture", this);
+    {
+        bouton_fermeture_serveur->setToolTip("Ferme le serveur et déconnecte tout le monde");
+        bouton_fermeture_serveur->setEnabled(false); // On ne peut pas cliquer tant que le serveur n'est pas ouvert
+        QObject::connect(bouton_fermeture_serveur, &QPushButton::clicked, this, &fenetre_serveur::fermer_serveur);
+    }
+
+    // Texte d'information du serveur
+    etatServeur = new QLabel(this);
+    {
+        etatServeur->setText("Le serveur est fermé");
+    }
+
     boutonQuitter = new QPushButton("Quitter", this);
-    QObject::connect(boutonQuitter, SIGNAL(clicked()), qApp, SLOT(quit()));
+    {
+        boutonQuitter->setToolTip("Ferme le serveur et la fenêtre");
+        QObject::connect(boutonQuitter, SIGNAL(clicked()), qApp, SLOT(quit())); /* Je laisse cette syntaxe car je ne sais pas de quoi quit est membre*/
+    }
 
     // Disposition
-    layout = new QVBoxLayout(this); //Pour ne pas s'embêter avec les ->setGeometry
-    layout->addWidget(etatServeur);
-    layout->addWidget(boutonQuitter);
+    layout_principal = new QFormLayout(this); //Pour ne pas s'embêter avec les ->setGeometry
+    {
+        layout_principal->addRow(champ_port);
+        layout_principal->addRow(bouton_ouverture_serveur, bouton_fermeture_serveur);
+        layout_principal->addRow(etatServeur);
+        layout_principal->addRow(boutonQuitter);
+    }
     setWindowTitle("Fenetre du serveur");
+
+
 
     // Demarrage du serveur
     /* Songer a mettre ceci hors du constructeur plus tard : J'aimerai pouvoir faire plusieurs serveurs en simultanné */
-    serveur = new QTcpServer(this);
-    // Attente de la connexion de n'importe qui sur le port 50885.
-    if( !serveur->listen(QHostAddress::Any, 50885)){ /* Si possible laisser l'utilisateur choisir son port ou un port automatique*/
-        etatServeur->setText("Le serveur n'a pas pu demarrer : <br />" + serveur->errorString());
-    }
-    else{
-        etatServeur->setText("Le serveur a démarré sur le port <strong>" + QString::number(serveur->serverPort()) + "</strong>.<br /> Des clients peuvent maintenant se connecter");
-        QObject::connect(serveur, &QTcpServer::newConnection, this, &fenetre_serveur::nouvelleConnexion);
-    }
 }
 
+void fenetre_serveur::ouvrir_serveur()
+{
+    bouton_ouverture_serveur->setEnabled(false);
+    quint16 port = champ_port->text().toUInt();
+    serveur = new QTcpServer(this);
+    if( !serveur->listen(QHostAddress::Any, port)){ // listen renvoi 0 si le port est disponible
+        etatServeur->setText("Le serveur n'a pas pu demarrer : <br />" + serveur->errorString());
+        bouton_ouverture_serveur->setEnabled(true);
+    }
+    else{
+        bouton_fermeture_serveur->setEnabled(true);
+        etatServeur->setText("Le serveur a démarré sur le port <strong>" + QString::number(serveur->serverPort()) + "</strong>.");
+        QObject::connect(serveur, &QTcpServer::newConnection, this, &fenetre_serveur::nouvelleConnexion);
+    }
+
+}
+
+void fenetre_serveur::fermer_serveur()
+{
+    envoyerATous("Le serveur va fermer");
+    for(int i = 0; i < clients.size(); i++)
+    {
+        clients[i]->close(); //On parcours les clients et on les déconnectes un à un
+    }
+    serveur->close(); // Fermeture du serveur
+    serveur = nullptr; // Suppression du serveur
+    clients.clear(); // On vide la liste des clients
+    bouton_fermeture_serveur->setEnabled(false);
+    bouton_ouverture_serveur->setEnabled(true);
+    etatServeur->setText("Le serveur est fermé");
+}
 
 void fenetre_serveur::nouvelleConnexion()
 {
