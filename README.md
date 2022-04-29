@@ -3,6 +3,11 @@ Projet de chat multicast demandé pour le cours d'OS et réseau // Côté serveu
 
 --------------------------------------
 
+# Serveur-1.0.4 : corrections de propreté
+1) remplacement du goto/label par une boucle do/while dans le slot "donneesRecues"
+2) dans les slot "donneesRecues" et "deconnexionClient", réécriture des if : Les conditions sont inversées dans les if, ce qui était fait précédément si on entrait pas dans le if est désormais fait si on entre dans les if, et les return vont dans les else, comme cas par défaut. Les if n'ont plus de pate en l'air.
+
+
 # Serveur-1.0.3 : Correction du retard
 1) La fonction de réception des données du client s'arrêtais une fois qu'elle a lu un message dont la taille est indiquée par le début d'un message, ce qui entraînait un retard d'autant plus important que le serveur envoie de messages. ajout d'un label et d'un goto pour rester dans la fonction tant qu'on est pas arrivé à la fin du flux du socket. La même modification a été apportée au serveur.
 

@@ -56,25 +56,29 @@ void fenetre_serveur::donneesRecues()
 
     QTcpSocket *socket = qobject_cast< QTcpSocket *>(sender());
     if(socket == 0){ return; }
-debut:
 
     // Recuperation du message
-    QDataStream in(socket); /*rendre les if plus propres */
-    if(tailleMessage == 0){ // Si on a pas déjà la taille du message
+    QDataStream in(socket);
+    do{
+        if(tailleMessage == 0){ // Si on a pas déjà la taille du message
+            if(socket->bytesAvailable() >= (int)sizeof(quint16)){ // Si on au moins un entier, alors on a la taille du message
+                in >> tailleMessage;
+            }
+            else{// Si on a pas au moins un int, alors on a pas encore reçu le message en entier
+                return;
+            }
+        }
 
-        if(socket->bytesAvailable() < (int)sizeof(quint16)){ // Si on a pas au moins un int, alors on a pas encore reçu le message en entier
+        if(socket->bytesAvailable() >= tailleMessage){
+            QString message;
+            in >> message; // On vide entièrement in dans message;
+            envoyerATous(message); // On l'envoi à tout le monde;
+            tailleMessage = 0; // On se rend prêt à recevoir un nouveau message;
+        }
+        else{ // Si on a pas encore le message entier, on attend
             return;
         }
-        in >> tailleMessage; // Si on au moins un entier, alors on a la taille du message
-    }
-
-    if(socket->bytesAvailable() < tailleMessage) {return;} // Si on a pas encore le message entier, on attend
-
-    QString message;
-    in >> message; // On vide entièrement in dans message;
-    envoyerATous(message); // On l'envoi à tout le monde;
-    tailleMessage = 0; // On se rend prêt à recevoir un nouveau message;
-    if(!in.atEnd()){goto debut;}
+    }while(!in.atEnd());
 }
 
 void fenetre_serveur::envoyerATous(const QString& message)
@@ -100,10 +104,11 @@ void fenetre_serveur::deconnexionClient()
 
     // Qui ?
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
-    if( socket == 0) { return; }
-
-    clients.removeOne(socket); // On retire le client
-    socket->deleteLater();
-    /* Mettre des else !!! */
-
+    if( socket != 0){
+        clients.removeOne(socket); // On retire le client
+        socket->deleteLater();
+    }
+    else{
+        return;
+    }
 }
